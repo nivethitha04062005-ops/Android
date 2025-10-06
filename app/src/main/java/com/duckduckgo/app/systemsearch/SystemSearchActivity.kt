@@ -30,6 +30,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
@@ -73,6 +75,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.browser.ui.omnibar.OmnibarPosition
+import com.duckduckgo.browser.ui.omnibar.OmnibarPosition.TOP
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -85,6 +88,10 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -148,6 +155,43 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var duckAi: ImageView
     private lateinit var omnibarDivider: View
 
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    private val inputScreenLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            val data = result.data ?: return@registerForActivityResult
+
+            when (result.resultCode) {
+                InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
+                    data.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                        launchBrowser(query)
+                    }
+                }
+
+                InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
+                    data.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
+                        launchBrowser(query = "", openExistingTabId = tabId)
+                    }
+                }
+
+                RESULT_CANCELED -> {
+                    data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
+                        finish()
+                    }
+                }
+            }
+        }
+
+    private fun launchInputScreen(isTopOmnibar: Boolean) {
+        globalActivityStarter.startIntent(
+            this,
+            InputScreenActivityParams(query = "", isTopOmnibar = isTopOmnibar),
+        )?.let {
+            inputScreenLauncher.launch(it)
+        }
+    }
+
     private val textChangeWatcher =
         object : TextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
@@ -205,6 +249,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
 
         showKeyboard(omnibarTextInput)
+
+        logcat { "lp_test; on create activity" }
+        if (duckAiFeatureState.showInputScreen.value) {
+            logcat { "lp_test; on create check done" }
+            launchInputScreen(isTopOmnibar = isOmnibarAtTop)
+        }
     }
 
     override fun onResume() {

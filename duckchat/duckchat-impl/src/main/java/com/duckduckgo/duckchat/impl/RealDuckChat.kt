@@ -274,6 +274,7 @@ class RealDuckChat @Inject constructor(
 
     init {
         if (isMainProcess) {
+            logcat { "lp_test; init" }
             cacheConfig()
         }
     }
@@ -580,6 +581,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun cacheConfig() {
+        logcat { "lp_test; cacheConfig" }
         appCoroutineScope.launch(dispatchers.io()) {
             val featureEnabled = duckChatFeature.self().isEnabled()
             isDuckChatFeatureEnabled = featureEnabled
@@ -611,6 +613,7 @@ class RealDuckChat @Inject constructor(
             keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
+            logcat { "lp_test; cacheUserSettings" }
             cacheUserSettings()
         }
     }
@@ -622,6 +625,7 @@ class RealDuckChat @Inject constructor(
             val showInputScreen =
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
                     duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            logcat { "lp_test; emit: $showInputScreen" }
             _showInputScreen.emit(showInputScreen)
 
             _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
