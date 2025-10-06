@@ -89,9 +89,8 @@ class AddressBarTrackersAnimator @Inject constructor(
                 entities.size,
             )
 
-        val trackerAnimationStartCount = trackerCountAnimator.getTrackerAnimationStartCount(entities.size)
         val trackerAnimationEndCount = trackerCountAnimator.getTrackerAnimationEndCount(entities.size)
-        trackersBlockedCountTextViewScene1.text = trackerAnimationStartCount.toString()
+        trackersBlockedCountTextViewScene1.text = trackerAnimationEndCount.toString()
         trackersBlockedCountTextViewScene2.text = trackerAnimationEndCount.toString()
 
         val scene1 = Scene(sceneRoot, scene1Layout)
