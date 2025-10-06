@@ -135,7 +135,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     override fun startAddressBarTrackersAnimation(
         context: Context,
         sceneRoot: ViewGroup,
-        cookieBackground: View,
+        animatedIconBackgroundView: View,
         addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView,
         omnibarViews: List<View>,
         shieldViews: List<View>,
@@ -146,7 +146,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         addressBarTrackersAnimator.startAnimation(
             context = context,
             sceneRoot = sceneRoot,
-            cookieBackground = cookieBackground,
+            animatedIconBackgroundView = animatedIconBackgroundView,
             addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
             omnibarViews = omnibarViews,
             shieldViews = shieldViews,

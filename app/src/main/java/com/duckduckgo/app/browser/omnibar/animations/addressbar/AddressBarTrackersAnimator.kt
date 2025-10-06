@@ -47,7 +47,7 @@ class AddressBarTrackersAnimator @Inject constructor(
     fun startAnimation(
         context: Context,
         sceneRoot: ViewGroup,
-        cookieBackground: View,
+        animatedIconBackgroundView: View,
         addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView,
         omnibarViews: List<View>,
         shieldViews: List<View>,
@@ -108,7 +108,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                         )
                         .with(
                             commonAddressBarAnimationHelper.animateFadeIn(
-                                cookieBackground,
+                                animatedIconBackgroundView,
                                 CommonAddressBarAnimationHelper.Companion.DEFAULT_ANIMATION_DURATION,
                             ),
                         )
@@ -153,7 +153,7 @@ class AddressBarTrackersAnimator @Inject constructor(
                     play(commonAddressBarAnimationHelper.animateViewsIn(omnibarViews + shieldViews))
                     play(
                         commonAddressBarAnimationHelper.animateFadeOut(
-                            cookieBackground,
+                            animatedIconBackgroundView,
                             CommonAddressBarAnimationHelper.Companion.DEFAULT_ANIMATION_DURATION,
                         ),
                     )
